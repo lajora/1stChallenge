@@ -1,21 +1,35 @@
-the_file='text.txt'
+file='text.txt'
 h = Hash.new
-f = File.open(the_file, "r")
+f = File.open(file, "r")
 f.each_line { |line|
-  words = line.split
+  words = line.split(/[\W_]+/)
   words.each { |w|
-    if h.has_key?(w)
-      h[w] = h[w] + 1
+    downcase = w.downcase
+    if h.has_key?(downcase)
+      h[downcase] = h[downcase] + 1
     else
-      h[w] = 1
+      h[downcase] = 1
     end
   }
 }
-h.sort{|a,b| a[1]<=>b[1]}.each { |elem|
-  puts "\"#{elem[0]}\" has #{elem[1]} occurrences"
-}
 
-print h.values.sum
+final = h.sort_by{ |key, value| value}.reverse # array of arrays with word and occurences
 
-final = h.sort_by{ |key, value|}.reverse
-print final
+count = final.sum { | word, number | number} # total number of words
+
+limit = (count * 0.8).to_i # 80% of total
+
+# iterate over array of sub_arrays and sum occurence
+# fill in eighty_percent with sub_arrays until sum is >= limit
+
+sum = 0
+eighty_percent = []
+final.each do | sub_array |
+  sum += sub_array[1]
+  eighty_percent << sub_array
+  if sum >= limit
+    break
+  end
+end
+
+p eighty_percent.length
